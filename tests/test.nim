@@ -12,31 +12,59 @@ myDumpTree "TestConfigType" :
   age = ?int  # nullable
   defaultVal = [string, default: "hello", test: "b" in x]
   defaultInferred = 4
-  inferredWithTest = [default: 4, test: x < 54]
-
+  inferredWithTest = [int, default: 4, test: x < 54]
+  listWithNullable = [?string, default: "hello"]
 
 dumpTree:
+  discard
   
-  type
-    TestConfigType = object of TConfig
-      filename*: string not nil
-      age*: int
-      defaultVal: string
-      defaultInferred: int
-      inferredWithTest: int
+type
+  powConfig = object
+    filename*: string
+    inferredWithTest*: BiggestInt
+    defaultVal*: string
+    defaultInferred*: BiggestInt
+    age*: BiggestInt
 
-  proc testTestConfigType(val: TestConfigType): bool =
-    block:
-      let x = val.defaultVal
+dumpTree:
+  #when false: 
+  # type
+  #   TestConfigType = object
+  #     filename*: string
+  #     age*: int
+  #     defaultVal: string
+  #     defaultInferred: int
+  #     inferredWithTest: int
 
-      if not "b" in x:
-        return false
+  proc fromFile(T: typedesc[powConfig], filename: string): T =
+    discard
 
-    block:
-      let x = val.inferredWithTest
+  #     if x == nil:
+  #       return false
+  #     elif not "b" in x:
+  #       return false
 
-      if not x < 54:
-        return false
+  #   block:
+  #     let x = val.inferredWithTest
+
+  #     if x == nil:
+  #       return false
+  #     elif not x < 54:
+  #       return false
+
+  # proc new(T: typedesc[TestConfigType], file: string, format: TConfigFormat): TestConfigType =
+  #   result = T()
+  #   result.loadDefaults()
+  #   result.loadFromFile(file, format)
+
+  # proc loadDefaults(c: TestConfigType) =
+  #   # load from defaults
+
+  # proc loadFromFile(c: TestConfigType, file: string, format: TConfigFormat) =
+  #   # load from File
+
+dumpTree:
+  "hello"
 
 discard """
 StrLit TestConfigType
@@ -78,6 +106,15 @@ StmtList
           Ident !"<"
           Ident !"x"
           IntLit 54
+  Asgn
+    Ident !"listWithNullable"
+    Bracket
+      Prefix
+        Ident !"?"
+        Ident !"string"
+      ExprColonExpr
+        Ident !"default"
+        StrLit hello
 ------
 StmtList
   TypeSection
@@ -171,4 +208,73 @@ StmtList
               StmtList
                 ReturnStmt
                   Ident !"false"
+  ProcDef
+    Ident !"new"
+    Empty
+    Empty
+    FormalParams
+      Ident !"TestConfigType"
+      IdentDefs
+        Ident !"T"
+        BracketExpr
+          Ident !"typedesc"
+          Ident !"TestConfigType"
+        Empty
+      IdentDefs
+        Ident !"file"
+        Ident !"string"
+        Empty
+      IdentDefs
+        Ident !"format"
+        Ident !"TConfigFormat"
+        Empty
+    Empty
+    Empty
+    StmtList
+      Asgn
+        Ident !"result"
+        Call
+          Ident !"T"
+      Call
+        DotExpr
+          Ident !"result"
+          Ident !"loadDefaults"
+      Call
+        DotExpr
+          Ident !"result"
+          Ident !"loadFromFile"
+        Ident !"file"
+        Ident !"format"
+  ProcDef
+    Ident !"loadDefaults"
+    Empty
+    Empty
+    FormalParams
+      Empty
+      IdentDefs
+        Ident !"c"
+        Ident !"TestConfigType"
+        Empty
+    Empty
+    Empty
+    StmtList
+      CommentStmt
+  ProcDef
+    Ident !"loadFromFile"
+    Empty
+    Empty
+    FormalParams
+      Empty
+      IdentDefs
+        Ident !"c"
+        Ident !"TestConfigType"
+        Empty
+      IdentDefs
+        Ident !"file"
+        Ident !"string"
+        Empty
+      IdentDefs
+        Ident !"format"
+        Ident !"TConfigFormat"
+        Empty
 """

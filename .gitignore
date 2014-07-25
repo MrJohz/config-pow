@@ -1,1 +1,4 @@
 nimcache
+nakefile
+tests/*
+!tests/*.nim
